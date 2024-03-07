@@ -182,6 +182,14 @@ namespace ConsoleApp1
                 case 50:
                     for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) Mask[i, j] = 1;
                     Print();
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Console.Beep(200, 100);
+                        Console.Beep(150, 100);
+                        Console.Beep(100, 100);
+                        Console.Beep(300, 100);
+                        Console.Beep(250, 100);
+                    }
                     return;
                 default:
                     Mask[x, y] = 1;
@@ -200,7 +208,7 @@ namespace ConsoleApp1
 
             if(this.Mask[x,y] == 0)
             {
-                Console.Write("\x1b[48;5;248m Ñ");
+                Console.Write("\x1b[48;5;248m__");
                 return;
             }
             if (this.Mask[x,y] == 2)
