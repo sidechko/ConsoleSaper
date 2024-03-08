@@ -1,11 +1,30 @@
+using Microsoft.Win32;
 using System;
 
 namespace ConsoleMinesweeper
 {
     internal class Program
     {
+
+        static void ApplyColorInColnsole()
+        {
+            RegistryKey currentUserKey = Registry.CurrentUser;
+            RegistryKey console = currentUserKey.OpenSubKey("Console", true);
+            int vtlValue = (int) console.GetValue("VirtualTerminalLevel", 0);
+            if(vtlValue == 0)
+            {
+                try { console.SetValue("VirtualTerminalLevel", 1, RegistryValueKind.DWord); }
+                catch(Exception ex) { }
+            }
+            console.Close();
+            currentUserKey.Close();
+        }
+
+
         static void Main(string[] args)
         {
+            ApplyColorInColnsole();
+
             bool isEnd = false;
             int width = 20;
             int height = 20;
