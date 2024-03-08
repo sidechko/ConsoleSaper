@@ -1,6 +1,6 @@
 using System;
 
-namespace ConsoleApp1
+namespace ConsoleMinesweeper
 {
     internal class Program
     {
@@ -10,6 +10,63 @@ namespace ConsoleApp1
             int width = 20;
             int height = 20;
             int count = 30;
+
+            for(int i = 0; i < args.Length; i++) {
+                int tryParse;
+                string lowerArg = args[i].ToLower();
+
+                if (lowerArg == "-help")
+                {
+                    Console.WriteLine("Game arguments:");
+                    Console.WriteLine("-b | --bomb <count>   Bomb on board count.");
+                    Console.WriteLine("-w | --width <size>   Set board width.");
+                    Console.WriteLine("-h | --height <size>   Set board height.");
+                    Console.WriteLine("-s | --size <size>   Set board size.");
+                    Console.WriteLine();
+                    Console.WriteLine("Game info:");
+                    Console.WriteLine("For open cell press space bar.");
+                    Console.WriteLine("For flag/unflag cell press space f.");
+                    return;
+                }
+
+                if(lowerArg == "--bomb" || lowerArg == "-b")
+                {
+                    if (Int32.TryParse(args[i + 1], out tryParse))
+                    {
+                        count = tryParse;
+                    }
+                    continue;
+                }
+
+                if(lowerArg == "--width" || lowerArg == "-w")
+                {
+                    if (Int32.TryParse(args[i + 1], out tryParse))
+                    {
+                        width = tryParse;
+                    }
+                    continue;
+                }
+
+                if(lowerArg == "--height" || lowerArg == "-h")
+                {
+                    if (Int32.TryParse(args[i + 1], out tryParse))
+                    {
+                        height = tryParse;
+                    }
+                    continue;
+                }
+
+                if(lowerArg == "--size" || lowerArg == "-s")
+                {
+                    if (Int32.TryParse(args[i + 1], out tryParse))
+                    {
+                        width = tryParse;
+                        height = tryParse;
+                    }
+                    continue;
+                }
+            }
+
             Console.Clear();
             Board board = new Board(count, width, height);
             board.Print();
@@ -29,13 +86,16 @@ namespace ConsoleApp1
                     case ConsoleKey.Escape:
                         isEnd = true;
                         continue;
+
                     case ConsoleKey.F:
                         Console.Beep();
+                        board.Flag(pointX, pointY);
                         break;
                     case ConsoleKey.Spacebar:
                         Console.Beep(1600, 200);
                         board.Click(pointX, pointY);
                         break;
+
                     case ConsoleKey.LeftArrow:
                         pointX--;
                         break;
@@ -48,6 +108,7 @@ namespace ConsoleApp1
                     case ConsoleKey.DownArrow:
                         pointY++;
                         break;
+
                     default:
                         break;
                 }
@@ -61,7 +122,7 @@ namespace ConsoleApp1
                 Console.SetCursorPosition(2*pointX, pointY);
                 Console.Write("\x1b[48;5;207m  ");
             }
-
+            Console.SetCursorPosition(0, height);
             Console.WriteLine("\x1b[0m");
         }
     }
@@ -91,7 +152,6 @@ namespace ConsoleApp1
             this.Mask = new byte[Width, Height]; for (int i = 0; i < Width; i++) for (int j = 0; j < Height; j++) Mask[i, j] = 0;
             this.random = new Random(Seed);
         }
-
         internal Board(int BombCount, int Width, int Height) : this(BombCount, (int) (0x0000000ffffffff & DateTime.Now.Ticks), Width, Height)
         {
 
@@ -153,6 +213,14 @@ namespace ConsoleApp1
                 }
             }
         }
+        internal void Flag(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= this.Width || y >= this.Height)
+                return;
+            if (Mask[x, y] == 1)
+                return;
+            if (Mask[x, y] == 0) Mask[x, y] = 2; else Mask[x, y] = 0;
+        }
         internal void Click(int x, int y)
         {
             if (x < 0 || y < 0 || x >= this.Width || y >= this.Height)
@@ -163,7 +231,6 @@ namespace ConsoleApp1
                 Generate(x, y);
             Open(x, y);
         }
-
         private void Open(int x, int y)
         {
             if (x < 0 || y < 0 || x >= this.Width || y >= this.Height)
@@ -197,7 +264,6 @@ namespace ConsoleApp1
             }
             PrintCell(x, y);
         }
-
         internal void PrintCell(int x, int y)
         {
             if (x < 0 || x >= Width)
@@ -208,7 +274,7 @@ namespace ConsoleApp1
 
             if(this.Mask[x,y] == 0)
             {
-                Console.Write("\x1b[48;5;248m__");
+                Console.Write("\x1b[48;5;248m\x1b[38;5;7m__");
                 return;
             }
             if (this.Mask[x,y] == 2)
@@ -269,8 +335,6 @@ namespace ConsoleApp1
                 {
                     PrintCell(x, y);
                 }
-                //if(y +1 < this.Height)
-                   // Console.Write("\x1b[48;5;233m\x1b[37m\n");
             }
         }
     }
